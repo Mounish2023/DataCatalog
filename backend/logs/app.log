@@ -1,0 +1,26 @@
+2025-11-17 21:09:08 | INFO     | app.main:lifespan:17 - Starting up Aspen Dental AI Assistant...
+2025-11-17 21:09:37 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:11:27 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:11:28 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:12:17 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:12:18 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:14:55 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:14:55 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:15:33 | INFO     | app.main:lifespan:35 - Shutting down...
+2025-11-17 21:15:35 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:15:35 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:16:44 | INFO     | app.main:lifespan:35 - Shutting down...
+2025-11-17 21:16:46 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:16:46 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:17:21 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:17:22 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:18:31 | INFO     | app.main:lifespan:27 - Shutting down...
+2025-11-17 21:19:37 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:19:37 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:24:30 | INFO     | app.main:lifespan:27 - Shutting down...
+2025-11-17 21:24:31 | INFO     | app.main:lifespan:17 - Starting up Gold Catalog MVP..
+2025-11-17 21:24:32 | INFO     | app.main:lifespan:19 - Database initialization completed
+2025-11-17 21:25:22 | INFO     | app.main:lifespan:27 - Shutting down...
+2025-11-17 21:25:23 | INFO     | app.main:lifespan:18 - Starting up Gold Catalog MVP..
+2025-11-17 21:25:23 | INFO     | app.main:lifespan:20 - Database initialization completed
+2025-11-17 22:13:56 | INFO     | app.main:lifespan:28 - Shutting down...
