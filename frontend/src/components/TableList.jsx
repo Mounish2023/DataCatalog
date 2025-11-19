@@ -34,12 +34,12 @@ export default function TableList({ onSelect, selectedTable }) {
       <h2>Gold Tables</h2>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {tables.map((table) => (
-          <li key={table.name} style={{ marginBottom: '8px' }}>
+          <li key={table.id} style={{ marginBottom: '8px' }}>
             <button
-              onClick={() => onSelect(table.name)}
-              className={`table-button ${selectedTable === table.name ? 'active' : ''}`}
+              onClick={() => onSelect(table.id)}
+              className={`table-button ${selectedTable === table.id ? 'active' : ''}`}
             >
-              {table.display_name || table.name}
+              {table.display_name || table.technical_name}
             </button>
           </li>
         ))}

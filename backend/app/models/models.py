@@ -79,11 +79,12 @@ class ColumnMetadata(Base):
     name = Column(String(255), nullable=False)
     data_type = Column(String(100))
     is_nullable = Column(Boolean)
+    default_value = Column(Text, nullable=True)
     constraints = Column(Text)
     business_description = Column(Text)
     sample_values = Column(Text)
 
-    version = Column(String, default=1)
+    version = Column(String, default="1")
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

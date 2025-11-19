@@ -3,22 +3,22 @@ import { useEffect, useState } from "react";
 import { fetchTable } from "../api/api";
 import ColumnEditor from "./ColumnEditor";
 
-export default function TableDetail({ tableName }) {
+export default function TableDetail({ tableId }) {
   const [table, setTable] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadTable = async () => {
-      if (!tableName) return;
+      if (!tableId) return;
       
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchTable(tableName);
+        const data = await fetchTable(tableId);
         setTable(data);
       } catch (err) {
-        console.error(`Error loading table ${tableName}:`, err);
+        console.error(`Error loading table with ID ${tableId}:`, err);
         setError(`Failed to load table details. ${err.message}`);
         setTable(null);
       } finally {
@@ -27,11 +27,11 @@ export default function TableDetail({ tableName }) {
     };
 
     loadTable();
-  }, [tableName]);
+  }, [tableId]);
 
   const handleColumnUpdated = async () => {
     try {
-      const data = await fetchTable(tableName);
+      const data = await fetchTable(tableId);
       setTable(data);
     } catch (err) {
       console.error('Error refreshing table:', err);
@@ -39,7 +39,7 @@ export default function TableDetail({ tableName }) {
     }
   };
 
-  if (!tableName) return <div className="empty-state">Select a table to view details</div>;
+  if (!tableId) return <div className="empty-state">Select a table to view details</div>;
   if (loading) return <div>Loading table details...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!table) return <div>No table data available.</div>;
@@ -58,7 +58,7 @@ export default function TableDetail({ tableName }) {
             {table.columns.map((col) => (
               <ColumnEditor
                 key={col.name}
-                tableName={tableName}
+                tableName={table.technical_name}
                 column={col}
                 onUpdated={handleColumnUpdated}
               />

@@ -1,4 +1,4 @@
-// src/pages/Home.jsx
+// frontend/src/pages/Home.jsx
 import { useState } from "react";
 import TableList from "../components/TableList";
 import TableDetail from "../components/TableDetail";
@@ -9,13 +9,6 @@ export default function Home() {
 
   return (
     <div className="app-container">
-      <header className="app-header">
-        <h1>Gold Data Catalog</h1>
-        <p className="app-description">
-          Explore and manage your data tables and their metadata
-        </p>
-      </header>
-
       <div className="app-content">
         <aside className="sidebar">
           <TableList 
@@ -25,12 +18,12 @@ export default function Home() {
         </aside>
 
         <main className="main-content">
-          <TableDetail tableName={selectedTable} />
+          <TableDetail tableId={selectedTable} />
         </main>
       </div>
 
       <footer className="app-footer">
-        <p>© {new Date().getFullYear()} Gold Data Catalog</p>
+        <p> {new Date().getFullYear()} Gold Data Catalog</p>
       </footer>
     </div>
   );

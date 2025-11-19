@@ -1,23 +1,27 @@
-
-
-# backend/app/auth.py
+# app/auth.py
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from typing import Optional
 import os
 from fastapi.security import OAuth2PasswordBearer
+from typing import Optional
 
-PWD_CTX = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "supersecretchangeinprod")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60*24  # 1 day
+PWD_CTX = CryptContext(
+    schemes=["bcrypt", "pbkdf2_sha256"],
+    default="bcrypt",
+    bcrypt__rounds=12,
+    pbkdf2_sha256__default_rounds=600_000,
+)
 
 def hash_password(password: str) -> str:
     return PWD_CTX.hash(password)
 
-def verify_password(plain, hashed) -> bool:
+def verify_password(plain: str, hashed: str) -> bool:
     return PWD_CTX.verify(plain, hashed)
+# JWT configuration
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecretchangeinprod")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 
 def create_access_token(sub: str, expires_delta: Optional[timedelta] = None):
     to_encode = {"sub": sub}
