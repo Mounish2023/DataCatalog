@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from .config import settings
 # Import Base from models.base
 from .models.base import Base
+from sqlalchemy import text
 
 # Create async engine
 engine = create_async_engine(
@@ -33,4 +34,6 @@ async def create_tables():
 # Drop tables
 async def drop_tables():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        # Drop schema public and recreate it
+        await conn.execute(text("DROP SCHEMA public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))

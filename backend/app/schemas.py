@@ -24,9 +24,9 @@ class TableUpdate(BaseModel):
     status: Optional[str]
 
 class ColumnUpdate(BaseModel):
-    business_description: Optional[str]
-    constraints: Optional[str]
-    sample_values: Optional[str]
+    business_description: Optional[str] = None
+    constraints: Optional[str] = None
+    sample_values: Optional[str] = None
 
 class IngestRequest(BaseModel):
     target_db_url: str

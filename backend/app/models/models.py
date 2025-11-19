@@ -4,16 +4,13 @@ SQLAlchemy Models for Metadata Management System
 
 from sqlalchemy import (
     Column, String, Boolean, DateTime, Text, ForeignKey,
-    Enum, UniqueConstraint
+    Enum
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
 import enum
 import uuid
-
-# Import Base from models.base
 from .base import Base
 
 
@@ -24,6 +21,22 @@ class Role(enum.Enum):
     viewer = "viewer"
     curator = "curator"
     admin = "admin"
+
+
+class Sensitivity(enum.Enum):
+    public = "public"
+    internal = "internal"
+    confidential = "confidential"
+    pii = "pii"
+
+
+class TableType(enum.Enum):
+    fact = "fact"
+    dimension = "dimension"
+    reference = "reference"
+    staging = "staging"
+    raw = "raw"
+    view = "view"
 
 
 # ============================================
@@ -44,54 +57,108 @@ class User(Base):
     # (optional: add back_populates if you want)
     # tables = relationship("Table", back_populates="owner")
 
+# ==========================================================
+# 1. DATABASE METADATA
+# ==========================================================
 
-# ============================================
-# 2. TABLE METADATA
-# ============================================
-class Table(Base):
-    __tablename__ = "tables"
+class DatabaseMetadata(Base):
+    __tablename__ = "database_metadata"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    database_name = Column(String(255), nullable=False, unique=True, index=True)
+    business_domain = Column(String(255))     # e.g., Sales, Finance, HR
+    description = Column(Text)
+    sensitivity = Column(Enum(Sensitivity), default=Sensitivity.internal)
+
+    owner = Column(String(255))               # business owner/steward
+    refresh_frequency = Column(String(100))   # daily, hourly, real-time
+    source_systems = Column(Text)             # list of upstream systems
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    tables = relationship(
+        "TableMetadata",
+        back_populates="database",
+        cascade="all, delete-orphan"
+    )
+
+
+# ==========================================================
+# 2. TABLE METADATA
+# ==========================================================
+
+class TableMetadata(Base):
+    __tablename__ = "table_metadata"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    database_id = Column(UUID(as_uuid=True), ForeignKey("database_metadata.id"), nullable=False)
+
     technical_name = Column(String(255), unique=True, index=True, nullable=False)
     display_name = Column(String(255))
     description = Column(Text)
-    owner_user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+
+    table_type = Column(Enum(TableType), nullable=False, default=TableType.raw)
     business_purpose = Column(Text)
     status = Column(String(50), default="active")
 
+    refresh_frequency = Column(String(100))
+    sla_info = Column(Text)
+
+    primary_key = Column(String(255))         # optional PK info
+    foreign_keys = Column(Text)               # optional FK list as text
+    cardinality_overview = Column(Text)       # e.g., 1:M relations
+
+    owner = Column(String(255))               # table-level data owner/steward
+    data_sensitivity = Column(Enum(Sensitivity), default=Sensitivity.internal)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
-    columns = relationship("ColumnMetadata", back_populates="table", cascade="all, delete-orphan")
-    # owner = relationship("User", back_populates="tables")
+    database = relationship("DatabaseMetadata", back_populates="tables")
+    columns = relationship(
+        "ColumnMetadata",
+        back_populates="table",
+        cascade="all, delete-orphan"
+    )
 
 
-# ============================================
+# ==========================================================
 # 3. COLUMN METADATA
-# ============================================
+# ==========================================================
+
 class ColumnMetadata(Base):
-    __tablename__ = "columns"
+    __tablename__ = "column_metadata"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    table_id = Column(UUID(as_uuid=True), ForeignKey("tables.id"), index=True, nullable=False)
 
-    name = Column(String(255), nullable=False)
-    data_type = Column(String(100))
-    is_nullable = Column(Boolean)
-    default_value = Column(Text, nullable=True)
-    constraints = Column(Text)
-    business_description = Column(Text)
-    sample_values = Column(Text)
+    table_id = Column(UUID(as_uuid=True), ForeignKey("table_metadata.id"), nullable=False)
 
-    version = Column(String, default="1")
+    column_name = Column(String(255), nullable=False)
+    data_type = Column(String(255))
+    description = Column(Text)
+
+    is_primary_key = Column(Boolean, default=False)
+    is_foreign_key = Column(Boolean, default=False)
+    is_nullable = Column(Boolean, default=True)
+    is_pii = Column(Boolean, default=False)
+
+    cardinality = Column(String(100))        # unique, low-card, high-card
+    valid_values = Column(Text)
+    example_value = Column(String(255))
+
+    transformation_logic = Column(Text)      # if derived
+    downstream_usage = Column(Text)          # how analytics use this column
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
+    
     # Relationships
-    table = relationship("Table", back_populates="columns")
-
+    table = relationship("TableMetadata", back_populates="columns")
 
 # ============================================
 # 4. AUDIT LOG TABLE

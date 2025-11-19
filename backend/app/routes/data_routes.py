@@ -7,7 +7,7 @@ from app.database import get_db
 from app import schemas, audit
 from app.services import ingest
 
-from app.models.models import Table, User, Column
+from app.models.models import TableMetadata, ColumnMetadata, User
 from .auth_routes import get_current_user
 
 router = APIRouter(tags=["data"])
@@ -28,21 +28,21 @@ async def export_json(
             raise HTTPException(status_code=400, detail="Invalid table IDs provided")
             
         result = await session.execute(
-            select(Table).where(Table.id.in_(ids))
+            select(TableMetadata).where(TableMetadata.id.in_(ids))
         )
         tables = result.scalars().all()
     else:
         # Get all tables if no IDs provided
-        result = await session.execute(select(Table))
+        result = await session.execute(select(TableMetadata))
         tables = result.scalars().all()
 
     payload = []
     for t in tables:
         # Get columns for this table
         result = await session.execute(
-            select(Column)
-            .where(Column.table_id == t.id)
-            .order_by(Column.id)
+            select(ColumnMetadata)
+            .where(ColumnMetadata.table_id == t.id)
+            .order_by(ColumnMetadata.id)
         )
         cols = result.scalars().all()
         

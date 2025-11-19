@@ -10,7 +10,7 @@ from app.routes import (
 import os
 from contextlib import asynccontextmanager
 from app.config import settings
-from app.database import create_tables
+from app.database import create_tables, drop_tables
 from app.utils.logger import logger
 
 @asynccontextmanager
@@ -25,6 +25,7 @@ async def lifespan(app: FastAPI):
     os.environ["LANGSMITH_ENDPOINT"] =settings.LANGSMITH_ENDPOINT
 
     yield
+    await drop_tables()
     # Shutdown
     logger.info("Shutting down...")
 

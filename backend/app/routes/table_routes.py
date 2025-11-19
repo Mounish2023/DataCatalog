@@ -5,7 +5,7 @@ from typing import List
 
 from app.database import get_db
 from app import schemas, audit
-from app.models.models import Table, ColumnMetadata, User
+from app.models.models import TableMetadata, ColumnMetadata, User
 from .auth_routes import get_current_user
 
 router = APIRouter(prefix="/api/tables", tags=["tables"])
@@ -16,11 +16,11 @@ async def list_tables(
     session: AsyncSession = Depends(get_db), 
     user: User = Depends(get_current_user)
 ):
-    stmt = select(Table)
+    stmt = select(TableMetadata)
     if q:
-        stmt = select(Table).where(
-            Table.technical_name.ilike(f"%{q}%") | 
-            Table.display_name.ilike(f"%{q}%")
+        stmt = select(TableMetadata).where(
+            TableMetadata.technical_name.ilike(f"%{q}%") | 
+            TableMetadata.display_name.ilike(f"%{q}%")
         )
     result = await session.execute(stmt)
     results = result.scalars().all()
@@ -39,7 +39,7 @@ async def get_table(
     session: AsyncSession = Depends(get_db), 
     user: User = Depends(get_current_user)
 ):
-    result = await session.execute(select(Table).where(Table.id == table_id))
+    result = await session.execute(select(TableMetadata).where(TableMetadata.id == table_id))
     t = result.scalars().first()
     if not t:
         raise HTTPException(status_code=404, detail="Table not found")
@@ -73,7 +73,7 @@ async def create_table(
 ):
     # Check if table exists
     result = await session.execute(
-        select(Table).where(Table.technical_name == payload.technical_name)
+        select(TableMetadata).where(TableMetadata.technical_name == payload.technical_name)
     )
     if result.scalars().first():
         raise HTTPException(status_code=400, detail="Table exists")
@@ -113,7 +113,7 @@ async def update_table(
     user: User = Depends(get_current_user)
 ):
     # Get table
-    result = await session.execute(select(Table).where(Table.id == table_id))
+    result = await session.execute(select(TableMetadata).where(TableMetadata.id == table_id))
     t = result.scalars().first()
     if not t:
         raise HTTPException(status_code=404, detail="Table not found")
@@ -171,7 +171,7 @@ async def delete_table(
     user: User = Depends(get_current_user)
 ):
     # Get table
-    result = await session.execute(select(Table).where(Table.id == table_id))
+    result = await session.execute(select(TableMetadata).where(TableMetadata.id == table_id))
     t = result.scalars().first()
     if not t:
         raise HTTPException(status_code=404, detail="Table not found")

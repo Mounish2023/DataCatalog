@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { updateColumn } from "../api/api";
 
-export default function ColumnEditor({ tableName, column, onUpdated }) {
+export default function ColumnEditor({ tableId, column, onUpdated }) {
   const [desc, setDesc] = useState(column.business_description || "");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -17,7 +17,7 @@ export default function ColumnEditor({ tableName, column, onUpdated }) {
     try {
       setIsSaving(true);
       setError(null);
-      await updateColumn(tableName, column.name, {
+      await updateColumn(tableId, column.id, {
         business_description: desc.trim(),
       });
       await onUpdated();

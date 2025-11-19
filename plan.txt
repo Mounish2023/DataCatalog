@@ -1,0 +1,27 @@
+Business Requirements Document:
+
+
+
+Database - business purpose
+Database - owner
+
+
+
+
+
+
+
+
+
+1. table - name
+2. table - description
+3. table - business purpose
+4. table - owner
+5. table - status
+
+
+Views
+
+
+
+BI Dashboard:

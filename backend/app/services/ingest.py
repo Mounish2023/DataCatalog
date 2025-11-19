@@ -6,13 +6,12 @@ and upserts them into the catalog tables/columns. Samples use LIMIT 5.
 from sqlalchemy import text, create_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.models import Table as CatalogTable, ColumnMetadata as CatalogColumn
+from app.models.models import TableMetadata as CatalogTable, ColumnMetadata as CatalogColumn
 from datetime import datetime
 
 async def ingest_from_target(session: AsyncSession, target_db_url: str, schema: str = "public", name_like: str = "gold%"):
     # For the target database, we'll use a synchronous connection since we're just querying
     # information_schema and don't need async for this part
-    from sqlalchemy import create_engine
     engine = create_engine(target_db_url.replace("postgresql+asyncpg://", "postgresql://"))
     
     with engine.connect() as conn:

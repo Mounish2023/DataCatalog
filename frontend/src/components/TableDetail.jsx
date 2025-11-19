@@ -58,7 +58,7 @@ export default function TableDetail({ tableId }) {
             {table.columns.map((col) => (
               <ColumnEditor
                 key={col.name}
-                tableName={table.technical_name}
+                tableId={table.id}
                 column={col}
                 onUpdated={handleColumnUpdated}
               />
