@@ -150,3 +150,5 @@
 2025-11-19 08:16:21 | INFO     | app.main:lifespan:19 - Starting up Gold Catalog MVP..
 2025-11-19 08:16:21 | INFO     | app.main:lifespan:21 - Database initialization completed
 2025-11-19 08:16:23 | INFO     | app.main:lifespan:30 - Shutting down...
+2025-11-19 08:16:43 | INFO     | app.main:lifespan:19 - Starting up Gold Catalog MVP..
+2025-11-19 08:16:43 | INFO     | app.main:lifespan:21 - Database initialization completed
