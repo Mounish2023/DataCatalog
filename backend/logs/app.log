@@ -206,3 +206,6 @@
 2025-11-20 08:11:59 | INFO     | app.main:lifespan:20 - Starting up Gold Catalog MVP..
 2025-11-20 08:12:00 | INFO     | app.main:lifespan:22 - Database initialization completed
 2025-11-20 08:12:05 | INFO     | app.main:lifespan:34 - Shutting down...
+2025-11-20 08:12:07 | WARNING  | app.services.metadata_ingestion:<module>:29 - OpenAI package not installed. GPT enrichment will be disabled.
+2025-11-20 08:12:07 | INFO     | app.main:lifespan:20 - Starting up Gold Catalog MVP..
+2025-11-20 08:12:07 | INFO     | app.main:lifespan:22 - Database initialization completed
