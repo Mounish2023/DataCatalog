@@ -1,12 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
-from typing import List
-
 from app.database import get_db
-from app import schemas, audit
-from app.services import ingest
-
 from app.models.models import TableMetadata, ColumnMetadata, User
 from .auth_routes import get_current_user
 
@@ -68,20 +63,4 @@ async def export_json(
         })
     return payload
 
-@router.post("/api/ingest")
-async def ingest_data(
-    payload: schemas.IngestRequest, 
-    session: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user)
-):
-    imported = await ingest.ingest_from_target(
-        session=session, 
-        target_db_url=payload.target_db_url, 
-        schema=payload.schema, 
-        name_like=payload.name_like
-    )
-    await audit.record_audit(
-        session, user.id, "ingest", "catalog", 
-        None, before=None, after=str(imported)
-    )
-    return {"imported": imported}
+

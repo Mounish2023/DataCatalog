@@ -3,7 +3,7 @@ import { useState } from "react";
 import { updateColumn } from "../api/api";
 
 export default function ColumnEditor({ tableId, column, onUpdated }) {
-  const [desc, setDesc] = useState(column.business_description || "");
+  const [desc, setDesc] = useState(column.description || "");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -18,7 +18,7 @@ export default function ColumnEditor({ tableId, column, onUpdated }) {
       setIsSaving(true);
       setError(null);
       await updateColumn(tableId, column.id, {
-        business_description: desc.trim(),
+        description: desc.trim(),
       });
       await onUpdated();
       setIsEditing(false);
@@ -31,69 +31,75 @@ export default function ColumnEditor({ tableId, column, onUpdated }) {
   };
 
   const handleCancel = () => {
-    setDesc(column.business_description || "");
+    setDesc(column.description || "");
     setError(null);
     setIsEditing(false);
   };
 
   return (
-    <div className="column-card">
-      <div className="column-header">
-        <h4>{column.name}</h4>
-        <div className="column-meta">
-          <span className="data-type">{column.data_type}</span>
-          <span className={`nullable ${column.nullable ? 'yes' : 'no'}`}>
-            {column.nullable ? 'Nullable' : 'Not Null'}
-          </span>
-        </div>
+    <div className="column-row">
+      <div className="column-name">
+        {column.name}
+        {column.is_primary_key && <span className="column-badge primary">PK</span>}
+        {column.is_foreign_key && <span className="column-badge foreign">FK</span>}
+        {column.is_pii && <span className="column-badge pii">PII</span>}
       </div>
-
+      <div className="column-type">
+        {column.data_type}
+        {column.nullable ? ' NULL' : ' NOT NULL'}
+      </div>
+      <div className="column-nullable">
+        {column.nullable ? '✓' : '✗'}
+      </div>
+      
       <div className="column-description">
-        <label>Business Description:</label>
         {isEditing ? (
           <>
             <textarea
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              rows="3"
-              placeholder="Enter business description..."
-              disabled={isSaving}
+              rows="2"
+              placeholder="Enter column description..."
             />
+            <div className="form-actions">
+              <button 
+                className="btn-save" 
+                onClick={handleSave} 
+                disabled={isSaving || !desc.trim()}
+              >
+                {isSaving ? 'Saving...' : 'Save'}
+              </button>
+              <button 
+                className="btn-cancel" 
+                onClick={handleCancel} 
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+            </div>
             {error && <div className="error-message">{error}</div>}
           </>
         ) : (
           <div className="description-text" onClick={() => setIsEditing(true)}>
-            {desc || <span className="placeholder">Click to add description</span>}
+            {desc || <span className="no-description">Click to add description</span>}
+            {column.example_value && (
+              <div className="example-value">
+                <span className="example-label">Example: </span>
+                <code>{column.example_value}</code>
+              </div>
+            )}
           </div>
         )}
-      </div>
-
-      <div className="column-actions">
-        {isEditing ? (
-          <>
-            <button 
-              onClick={handleSave} 
-              disabled={isSaving}
-              className="save-btn"
-            >
-              {isSaving ? 'Saving...' : 'Save'}
-            </button>
-            <button 
-              onClick={handleCancel} 
-              disabled={isSaving}
-              className="cancel-btn"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
+        
+        <div className="column-actions">
           <button 
-            onClick={() => setIsEditing(true)}
-            className="edit-btn"
+            className="icon-button" 
+            onClick={() => setIsEditing(!isEditing)}
+            title={isEditing ? 'Cancel' : 'Edit description'}
           >
-            Edit
+            {isEditing ? '✕' : '✏️'}
           </button>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
-
-from app.database import get_db
 from app import schemas, audit
-from app.models.models import TableMetadata, ColumnMetadata, User
+from app.database import get_db
+from app.models.models import TableMetadata, ColumnMetadata, DatabaseMetadata, User
 from .auth_routes import get_current_user
 
 router = APIRouter(prefix="/api/tables", tags=["tables"])
@@ -39,29 +38,63 @@ async def get_table(
     session: AsyncSession = Depends(get_db), 
     user: User = Depends(get_current_user)
 ):
+    # Get table metadata
     result = await session.execute(select(TableMetadata).where(TableMetadata.id == table_id))
-    t = result.scalars().first()
-    if not t:
+    table = result.scalars().first()
+    if not table:
         raise HTTPException(status_code=404, detail="Table not found")
+    
+    # Get related database info
+    db_result = await session.execute(select(DatabaseMetadata).where(DatabaseMetadata.id == table.database_id))
+    database = db_result.scalars().first()
+    
+    # Get columns
     cols_result = await session.execute(
-        select(ColumnMetadata).where(ColumnMetadata.table_id == t.id)
+        select(ColumnMetadata).where(ColumnMetadata.table_id == table.id)
     )
-    cols = cols_result.scalars().all()
+    columns = cols_result.scalars().all()
+    
     return {
-        "id": t.id, 
-        "technical_name": t.technical_name, 
-        "display_name": t.display_name, 
-        "description": t.description, 
+        "id": table.id,
+        "technical_name": table.technical_name,
+        "display_name": table.display_name,
+        "description": table.description,
+        "table_type": table.table_type.value if table.table_type else None,
+        "business_purpose": table.business_purpose,
+        "status": table.status,
+        "refresh_frequency": table.refresh_frequency,
+        "sla_info": table.sla_info,
+        "primary_key": table.primary_key,
+        "foreign_keys": table.foreign_keys,
+        "cardinality_overview": table.cardinality_overview,
+        "owner": table.owner,
+        "data_sensitivity": table.data_sensitivity.value if table.data_sensitivity else None,
+        "created_at": table.created_at.isoformat() if table.created_at else None,
+        "updated_at": table.updated_at.isoformat() if table.updated_at else None,
+        "database": {
+            "id": database.id if database else None,
+            "name": database.database_name if database else None,
+            "business_domain": database.business_domain if database else None,
+            "sensitivity": database.sensitivity.value if database and database.sensitivity else None
+        },
         "columns": [
             {
-                "id": c.id,
-                "name": c.name,
-                "data_type": c.data_type,
-                "description": c.business_description,
-                # "is_primary_key": c.is_primary_key,
-                "is_nullable": c.is_nullable,
-                "default_value": c.default_value
-            } for c in cols
+                "id": col.id,
+                "column_name": col.column_name,
+                "data_type": col.data_type,
+                "description": col.description,
+                "is_primary_key": col.is_primary_key,
+                "is_foreign_key": col.is_foreign_key,
+                "is_nullable": col.is_nullable,
+                "is_pii": col.is_pii,
+                "cardinality": col.cardinality,
+                "valid_values": col.valid_values,
+                "example_value": col.example_value,
+                "transformation_logic": col.transformation_logic,
+                "downstream_usage": col.downstream_usage,
+                "created_at": col.created_at.isoformat() if col.created_at else None,
+                "updated_at": col.updated_at.isoformat() if col.updated_at else None
+            } for col in columns
         ]
     }
 
@@ -79,7 +112,7 @@ async def create_table(
         raise HTTPException(status_code=400, detail="Table exists")
         
     # Create new table
-    t = Table(
+    t = TableMetadata(
         technical_name=payload.technical_name, 
         display_name=payload.display_name, 
         description=payload.description
@@ -122,7 +155,7 @@ async def update_table(
     before = {
         "display_name": t.display_name, 
         "description": t.description,
-        "owner_user_id": t.owner_user_id,
+        "owner": t.owner,
         "business_purpose": t.business_purpose,
         "status": t.status
     }
@@ -135,15 +168,16 @@ async def update_table(
     if payload.description is not None and payload.description != t.description:
         changes["description"] = {"old": t.description, "new": payload.description}
         t.description = payload.description
-    if payload.owner_user_id is not None and payload.owner_user_id != t.owner_user_id:
-        changes["owner_user_id"] = {"old": t.owner_user_id, "new": payload.owner_user_id}
-        t.owner_user_id = payload.owner_user_id
+    if payload.owner is not None and payload.owner != t.owner:
+        changes["owner"] = {"old": t.owner, "new": payload.owner}
+        t.owner = payload.owner
     if payload.business_purpose is not None and payload.business_purpose != t.business_purpose:
         changes["business_purpose"] = {"old": t.business_purpose, "new": payload.business_purpose}
         t.business_purpose = payload.business_purpose
     if payload.status is not None and payload.status != t.status:
         changes["status"] = {"old": t.status, "new": payload.status}
         t.status = payload.status
+    
     
     if not changes:
         return {"msg": "No changes detected"}

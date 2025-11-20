@@ -1,42 +1,123 @@
+// frontend/src/api/dataConnector.js
 import axios from 'axios';
 import { getAuthHeaders } from './api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-export const ingestData = async (targetDbUrl, schema = 'public', namePattern = '') => {
+/**
+ * Test database connection
+ */
+export const testConnection = async (connectionString) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/ingest`,
+      `${API_URL}/api/ingestion/test-connection`,
+      { connection_string: connectionString },
+      { 
+        headers: getAuthHeaders(),
+        params: { connection_string: connectionString }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error testing connection:', error);
+    throw error;
+  }
+};
+
+/**
+ * Run synchronous metadata ingestion
+ * Use for smaller databases (< 50 tables)
+ */
+export const runIngestionSync = async (
+  connectionString,
+  schema = 'public',
+  tablePattern = '%',
+  enrichWithGpt = true
+) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/ingestion/run-sync`,
       {
-        target_db_url: targetDbUrl,
+        target_connection_string: connectionString,
         schema: schema,
-        name_like: namePattern || '%'  // Default to all tables if no pattern provided
+        table_pattern: tablePattern,
+        enrich_with_gpt: enrichWithGpt
       },
       { headers: getAuthHeaders() }
     );
     return response.data;
   } catch (error) {
-    console.error('Error ingesting data:', error);
+    console.error('Error running sync ingestion:', error);
     throw error;
   }
 };
 
-export const testConnection = async (connectionString) => {
+/**
+ * Run asynchronous metadata ingestion
+ * Use for larger databases (50+ tables)
+ * Returns a job_id to track progress
+ */
+export const runIngestionAsync = async (
+  connectionString,
+  schema = 'public',
+  tablePattern = '%',
+  enrichWithGpt = true
+) => {
   try {
-    // This is a client-side test that only checks if the connection string is valid
-    // The actual connection test should be done on the backend
-    if (!connectionString) {
-      throw new Error('Connection string is required');
-    }
-    
-    // Basic validation for common database connection string formats
-    const dbTypes = ['postgresql://', 'mysql://', 'sqlserver://', 'oracle://', 'sqlite://','postgresql+asyncpg://'];
-    if (!dbTypes.some(type => connectionString.toLowerCase().startsWith(type))) {
-      throw new Error('Invalid connection string format');
-    }
-    
-    return { success: true, message: 'Connection string appears valid' };
+    const response = await axios.post(
+      `${API_URL}/api/ingestion/run`,
+      {
+        target_connection_string: connectionString,
+        schema: schema,
+        table_pattern: tablePattern,
+        enrich_with_gpt: enrichWithGpt
+      },
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
   } catch (error) {
-    return { success: false, message: error.message };
+    console.error('Error running async ingestion:', error);
+    throw error;
   }
+};
+
+/**
+ * Get status of an ingestion job
+ */
+export const getIngestionStatus = async (jobId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/ingestion/status/${jobId}`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error getting job status:', error);
+    throw error;
+  }
+};
+
+/**
+ * List all ingestion jobs for current user
+ */
+export const listIngestionJobs = async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/ingestion/jobs`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error listing jobs:', error);
+    throw error;
+  }
+};
+
+/**
+ * Legacy function for backward compatibility
+ * @deprecated Use runIngestionSync or runIngestionAsync instead
+ */
+export const ingestData = async (targetDbUrl, schema = 'public', namePattern = '') => {
+  console.warn('ingestData is deprecated. Use runIngestionSync or runIngestionAsync instead.');
+  return runIngestionSync(targetDbUrl, schema, namePattern || '%', true);
 };
