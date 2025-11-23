@@ -10,10 +10,11 @@ class Settings(BaseSettings):
     LANGSMITH_PROJECT_NAME: Optional[str] = None
     LANGSMITH_TRACING: Optional[str] = None
     LANGSMITH_ENDPOINT: Optional[str] = None
+    OPENAI_API_KEY_DC: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
 
     # CORS
-    ALLOWED_ORIGINS: list = ["http://localhost:3001", "http://localhost:5173","http://localhost:3002", "http://localhost:3000"]
+    ALLOWED_ORIGINS: list = ["http://localhost:3001", "http://localhost:5173","http://localhost:3002", "http://localhost:3000","http://localhost:5174"]
     DEBUG: bool = True
 
 

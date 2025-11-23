@@ -1,6 +1,6 @@
 // frontend/src/components/IngestionHelpGuide.jsx
 import React, { useState } from 'react';
-import '../styles/IngestionHelp.css';
+import '../../../styles/IngestionHelp.css';
 
 const IngestionHelpGuide = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,11 +13,11 @@ const IngestionHelpGuide = () => {
         <>
           <h3>What is Metadata Ingestion?</h3>
           <p>
-            Metadata ingestion extracts schema information from your database and enriches 
-            it with AI-powered semantic descriptions, making your data catalog more useful 
+            Metadata ingestion extracts schema information from your database and enriches
+            it with AI-powered semantic descriptions, making your data catalog more useful
             and searchable.
           </p>
-          
+
           <h4>What Gets Extracted:</h4>
           <ul>
             <li><strong>Database Info:</strong> Name, table count, structure</li>
@@ -35,14 +35,14 @@ const IngestionHelpGuide = () => {
         </>
       )
     },
-    
+
     connectionStrings: {
       title: '🔌 Connection Strings',
       content: (
         <>
           <h3>Database Connection Strings</h3>
           <p>Connection strings tell the system how to connect to your database.</p>
-          
+
           <h4>Format:</h4>
           <pre><code>postgresql://username:password@host:port/database</code></pre>
 
@@ -63,7 +63,7 @@ const IngestionHelpGuide = () => {
           </div>
 
           <div className="tip-box">
-            <strong>💡 Tip:</strong> Make sure your database is accessible from this application's 
+            <strong>💡 Tip:</strong> Make sure your database is accessible from this application's
             network. You may need to configure firewall rules or VPN access.
           </div>
         </>
@@ -112,7 +112,7 @@ const IngestionHelpGuide = () => {
           </div>
 
           <div className="warning-box">
-            <strong>⚠️ Note:</strong> Pattern matching is case-sensitive on most systems. 
+            <strong>⚠️ Note:</strong> Pattern matching is case-sensitive on most systems.
             If your table is "Customers", use the exact case.
           </div>
         </>
@@ -289,7 +289,7 @@ const IngestionHelpGuide = () => {
           </div>
 
           <div className="tip-box">
-            <strong>🔐 Best Practice:</strong> Create a dedicated read-only database user 
+            <strong>🔐 Best Practice:</strong> Create a dedicated read-only database user
             specifically for metadata ingestion. This limits exposure if credentials are compromised.
           </div>
         </>
@@ -299,7 +299,7 @@ const IngestionHelpGuide = () => {
 
   return (
     <>
-      <button 
+      <button
         className="help-trigger-button"
         onClick={() => setIsOpen(true)}
         title="Open Help Guide"
@@ -313,7 +313,7 @@ const IngestionHelpGuide = () => {
           <div className="help-modal" onClick={(e) => e.stopPropagation()}>
             <div className="help-header">
               <h2>Metadata Ingestion Guide</h2>
-              <button 
+              <button
                 className="help-close-button"
                 onClick={() => setIsOpen(false)}
               >

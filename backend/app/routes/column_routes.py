@@ -31,17 +31,40 @@ async def update_column(
         print(f"Column {column_id} belongs to table {col.table_id}, but request was for table {table_id}")
         raise HTTPException(status_code=404, detail="column not found in the specified table")
     before = {
-        "business_description": col.business_description, 
-        "constraints": col.constraints,
-        "sample_values": col.sample_values
+        "description": col.description,
+        "is_primary_key": col.is_primary_key,
+        "is_foreign_key": col.is_foreign_key,
+        "is_nullable": col.is_nullable,
+        "is_pii": col.is_pii,
+        "cardinality": col.cardinality,
+        "valid_values": col.valid_values,
+        "example_value": col.example_value,
+        "transformation_logic": col.transformation_logic,
+        "downstream_usage": col.downstream_usage
     }
-    if payload.business_description is not None:
-        col.business_description = payload.business_description
-    if payload.constraints is not None:
-        col.constraints = payload.constraints
-    if payload.sample_values is not None:
-        col.sample_values = payload.sample_values
-    # col.version += 1
+
+    # Update fields if provided in payload
+    if payload.description is not None:
+        col.description = payload.description
+    if payload.is_primary_key is not None:
+        col.is_primary_key = payload.is_primary_key
+    if payload.is_foreign_key is not None:
+        col.is_foreign_key = payload.is_foreign_key
+    if payload.is_nullable is not None:
+        col.is_nullable = payload.is_nullable
+    if payload.is_pii is not None:
+        col.is_pii = payload.is_pii
+    if payload.cardinality is not None:
+        col.cardinality = payload.cardinality
+    if payload.valid_values is not None:
+        col.valid_values = payload.valid_values
+    if payload.example_value is not None:
+        col.example_value = payload.example_value
+    if payload.transformation_logic is not None:
+        col.transformation_logic = payload.transformation_logic
+    if payload.downstream_usage is not None:
+        col.downstream_usage = payload.downstream_usage
+
     col.updated_at = __import__("datetime").datetime.utcnow()
     session.add(col)
     await session.commit()

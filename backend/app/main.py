@@ -5,7 +5,8 @@ from app.routes import (
     auth_router,
     table_router,
     column_router,
-    data_router
+    data_router,
+    database_router
 )
 from app.routes.ingestion_routes import router as ingestion_router
 import os
@@ -55,6 +56,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router)
+app.include_router(database_router)
 app.include_router(table_router)
 app.include_router(column_router)
 app.include_router(data_router)

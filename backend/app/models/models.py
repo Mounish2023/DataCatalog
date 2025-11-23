@@ -4,7 +4,7 @@ SQLAlchemy Models for Metadata Management System
 
 from sqlalchemy import (
     Column, String, Boolean, DateTime, Text, ForeignKey,
-    Enum
+    Enum, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -97,7 +97,7 @@ class TableMetadata(Base):
 
     database_id = Column(UUID(as_uuid=True), ForeignKey("database_metadata.id"), nullable=False)
 
-    technical_name = Column(String(255), unique=True, index=True, nullable=False)
+    technical_name = Column(String(255), index=True, nullable=False)
     display_name = Column(String(255))
     description = Column(Text)
 
@@ -117,6 +117,11 @@ class TableMetadata(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Table-level constraints
+    __table_args__ = (
+        UniqueConstraint('database_id', 'technical_name', name='uix_database_table'),
+    )
 
     # Relationships
     database = relationship("DatabaseMetadata", back_populates="tables")

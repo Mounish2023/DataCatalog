@@ -1,69 +1,59 @@
-// frontend/src/App.jsx
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
-import DataConnector from './pages/DataConnector';
-import './styles.css';
+import { Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
+import { AuthProvider, useAuth } from './features/auth/AuthContext';
+import Layout from './components/layout/Layout';
+import DatabaseDetail from './features/catalog/components/DatabaseDetail';
+import TableDetail from './features/catalog/components/TableDetail';
+import Connectors from './features/connectors/components/Connectors';
+import Login from './features/auth/Login';
+import Register from './features/auth/Register';
+import './App.css';
 
-function AppContent() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const [showRegister, setShowRegister] = useState(false);
-  const navigate = useNavigate();
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  if (loading) return <div>Loading...</div>;
 
   if (!isAuthenticated) {
-    return showRegister ? (
-      <Register onSwitchToLogin={() => setShowRegister(false)} />
-    ) : (
-      <Login onSwitchToRegister={() => setShowRegister(true)} />
-    );
+    return <Navigate to="/login" replace />;
   }
 
-  return (
-    <div>
-      <nav className="app-nav">
-        <div className="nav-container">
-          <div className="nav-logo">
-            <h1>Gold Data Catalog MVP</h1>
-          </div>
-          <div className="nav-links">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/data-connector" className="nav-link">Data Connector</Link>
-          </div>
-          <div className="nav-user">
-            <span>Welcome, {user?.name || user?.email}!</span>
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
-      
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/data-connector" element={<DataConnector />} />
-        </Routes>
-      </main>
-    </div>
-  );
+  return children;
 }
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected Routes */}
+        <Route element={
+          <ProtectedRoute>
+            <Layout>
+              <Outlet />
+            </Layout>
+          </ProtectedRoute>
+        }>
+          <Route path="/" element={
+            <div className="welcome-screen">
+              <h1>Welcome to Gold Catalog</h1>
+              <p>Select a database from the sidebar to get started.</p>
+            </div>
+          } />
+          <Route path="/databases/:databaseId" element={<DatabaseDetail />} />
+          <Route path="/tables/:tableId" element={<TableDetailWrapper />} />
+          <Route path="/connectors" element={<Connectors />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
+}
+
+// Wrapper to handle params
+function TableDetailWrapper() {
+  const { tableId } = useParams();
+  return <TableDetail tableId={tableId} />;
 }
 
 export default App;

@@ -21,13 +21,14 @@ from app.models.models import (
 )
 from app.utils.logger import logger
 
-# OpenAI client setup
+from app.config import settings
+
+# OpenAI client setup - initialized lazily in GPTEnricher
 try:
     from openai import AsyncOpenAI
-    openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 except ImportError:
     logger.warning("OpenAI package not installed. GPT enrichment will be disabled.")
-    openai_client = None
+    AsyncOpenAI = None
 
 
 class SchemaExtractor:
@@ -278,10 +279,25 @@ class GPTEnricher:
     
     def __init__(self, model: str = "gpt-4o"):
         self.model = model
-        self.client = openai_client
+        self.client = None
+        
+        api_key = settings.OPENAI_API_KEY or settings.OPENAI_API_KEY_DC
+        
+        if AsyncOpenAI and api_key:
+            self.client = AsyncOpenAI(api_key=api_key)
+        else:
+            if not AsyncOpenAI:
+                logger.warning("OpenAI library not installed")
+            elif not api_key:
+                logger.warning("OpenAI library not installed")
+            elif not api_key:
+                logger.warning("OPENAI_API_KEY not set in settings")
+        
+        print(f"DEBUG: GPTEnricher initialized. Client: {self.client is not None}")
     
     async def enrich_database(self, db_info: Dict) -> Dict:
         """Enrich database-level metadata"""
+        print(f"DEBUG: enrich_database called. Client available: {self.client is not None}")
         if not self.client:
             logger.warning("OpenAI client not available, skipping enrichment")
             return {
@@ -567,7 +583,9 @@ class MetadataIngestionPipeline:
         enrich: bool
     ) -> str:
         """Upsert database metadata"""
+        print(f"DEBUG: _upsert_database called with db_info={db_info}, enrich={enrich}")
         db_name = db_info["database_name"]
+        print(f"DEBUG: Processing database: {db_name}")
         
         # Check if exists
         result = await self.catalog_session.execute(
@@ -576,16 +594,20 @@ class MetadataIngestionPipeline:
             )
         )
         db_record = result.scalars().first()
+        print(f"DEBUG: Existing db_record found: {db_record is not None}")
         
         # Enrich if enabled
         enriched = {}
         if enrich:
+            print(f"DEBUG: Enrichment enabled for {db_name}")
             enriched = await self.enricher.enrich_database(db_info)
+            print(f"DEBUG: Enriched data for {db_name}: {enriched}")
         
         now = datetime.utcnow()
         
         if db_record:
             # Update existing
+            print(f"DEBUG: Updating existing database record for {db_name}")
             db_record.description = enriched.get("description", db_record.description)
             db_record.business_domain = enriched.get("business_domain", db_record.business_domain)
             db_record.sensitivity = enriched.get("sensitivity", db_record.sensitivity)
@@ -594,6 +616,7 @@ class MetadataIngestionPipeline:
             logger.info(f"Updated database: {db_name}")
         else:
             # Create new
+            print(f"DEBUG: Creating new database record for {db_name}")
             db_record = DatabaseMetadata(
                 database_name=db_name,
                 business_domain=enriched.get("business_domain", "Unknown"),
@@ -607,6 +630,7 @@ class MetadataIngestionPipeline:
             logger.info(f"Created database: {db_name}")
         
         await self.catalog_session.flush()
+        print(f"DEBUG: Database record flushed. ID: {db_record.id}")
         return str(db_record.id)
     
     async def _process_table(

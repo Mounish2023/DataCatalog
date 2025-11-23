@@ -1,10 +1,10 @@
-// frontend/src/pages/Register.jsx
 import { useState } from 'react';
-import { register as apiRegister, login as apiLogin } from '../api/api';
-import { useAuth } from '../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { register as apiRegister, login as apiLogin } from '../../services/api';
+import { useAuth } from './AuthContext';
 import './Auth.css';
 
-export default function Register({ onSwitchToLogin }) {
+export default function Register() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -12,6 +12,7 @@ export default function Register({ onSwitchToLogin }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,14 +35,15 @@ export default function Register({ onSwitchToLogin }) {
 
     try {
       setLoading(true);
-      
+
       // Register the user
       await apiRegister(email, name, password);
-      
+
       // Automatically login after successful registration
       const loginResponse = await apiLogin(email, password);
       login(loginResponse.access_token, { email, name });
-      
+      navigate('/', { replace: true });
+
     } catch (err) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed. Please try again.');
@@ -119,9 +121,9 @@ export default function Register({ onSwitchToLogin }) {
         <div className="auth-switch">
           <p>
             Already have an account?{' '}
-            <button onClick={onSwitchToLogin} className="link-button">
+            <Link to="/login" className="link-button">
               Login here
-            </button>
+            </Link>
           </p>
         </div>
       </div>

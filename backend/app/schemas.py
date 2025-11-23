@@ -24,9 +24,16 @@ class TableUpdate(BaseModel):
     status: Optional[str]
 
 class ColumnUpdate(BaseModel):
-    business_description: Optional[str] = None
-    constraints: Optional[str] = None
-    sample_values: Optional[str] = None
+    description: Optional[str] = None
+    is_primary_key: Optional[bool] = None
+    is_foreign_key: Optional[bool] = None
+    is_nullable: Optional[bool] = None
+    is_pii: Optional[bool] = None
+    cardinality: Optional[str] = None
+    valid_values: Optional[str] = None
+    example_value: Optional[str] = None
+    transformation_logic: Optional[str] = None
+    downstream_usage: Optional[str] = None
 
 class IngestRequest(BaseModel):
     target_db_url: str

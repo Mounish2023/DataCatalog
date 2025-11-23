@@ -1,0 +1,29 @@
+Error: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: value too long for type character varying(255)
+[SQL: INSERT INTO column_metadata (id, table_id, column_name, data_type, description, is_primary_key, is_foreign_key, is_nullable, is_pii, cardinality, valid_values, example_value, transformation_logic, downstream_usage, created_at, updated_at) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::BOOLEAN, $7::BOOLEAN, $8::BOOLEAN, $9::BOOLEAN, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::VARCHAR, $14::VARCHAR, $15::TIMESTAMP WITH TIME ZONE, $16::TIMESTAMP WITH TIME ZONE)]
+[parameters: (UUID('4ae45a02-4a06-40c6-b51a-871d7da57dca'), '5a6d9136-f686-474f-becd-83821e1e7cc1', 'before', 'text', 'Column: before (text)', False, False, True, False, 'low', "{'description': 'Column: description (text)', 'is_primary_key': False, 'is_foreign_key': False, 'is_nullable': True, 'is_pii': False, 'cardinality':  ... (265 characters truncated) ... nd soft tissues', 'example_value': 'Endodontic treatment for back tooth', 'transformation_logic': None, 'downstream_usage': 'General purpose column'}", "{'description': 'Column: description (text)', 'is_primary_key': False, 'is_foreign_key': False, 'is_nullable': True, 'is_pii': False, 'cardinality':  ... (265 characters truncated) ... nd soft tissues', 'example_value': 'Endodontic treatment for back tooth', 'transformation_logic': None, 'downstream_usage': 'General purpose column'}", None, 'General purpose column', datetime.datetime(2025, 11, 21, 14, 38, 39, 104232), datetime.datetime(2025, 11, 21, 14, 38, 39, 104232))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi) (Background on this error at: https://sqlalche.me/e/20/7s2a)
+Traceback (most recent call last):
+  File "D:\Mounish\DataCatalog\backend\debug_ingestion.py", line 24, in main
+    stats = await run_metadata_ingestion(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mounish\DataCatalog\backend\app\services\metadata_ingestion.py", line 816, in run_metadata_ingestion
+    return await pipeline.ingest_database(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mounish\DataCatalog\backend\app\services\metadata_ingestion.py", line 567, in ingest_database
+    await self.catalog_session.commit()
+  File "C:\Users\mouni\AppData\Roaming\Python\Python312\site-packages\sqlalchemy\ext\asyncio\session.py", line 1000, in commit
+    await greenlet_spawn(self.sync_session.commit)
+  File "C:\Users\mouni\AppData\Roaming\Python\Python312\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 190, in greenlet_spawn
+    result = context.switch(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mouni\AppData\Roaming\Python\Python312\site-packages\sqlalchemy\orm\session.py", line 2030, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\mouni\AppData\Roaming\Python\Python312\site-packages\sqlalchemy\orm\state_changes.py", line 101, in _go
+    self._raise_for_prerequisite_state(fn.__name__, current_state)
+  File "C:\Users\mouni\AppData\Roaming\Python\Python312\site-packages\sqlalchemy\orm\session.py", line 971, in _raise_for_prerequisite_state
+    raise sa_exc.PendingRollbackError(
+sqlalchemy.exc.PendingRollbackError: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: value too long for type character varying(255)
+[SQL: INSERT INTO column_metadata (id, table_id, column_name, data_type, description, is_primary_key, is_foreign_key, is_nullable, is_pii, cardinality, valid_values, example_value, transformation_logic, downstream_usage, created_at, updated_at) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::BOOLEAN, $7::BOOLEAN, $8::BOOLEAN, $9::BOOLEAN, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::VARCHAR, $14::VARCHAR, $15::TIMESTAMP WITH TIME ZONE, $16::TIMESTAMP WITH TIME ZONE)]
+[parameters: (UUID('4ae45a02-4a06-40c6-b51a-871d7da57dca'), '5a6d9136-f686-474f-becd-83821e1e7cc1', 'before', 'text', 'Column: before (text)', False, False, True, False, 'low', "{'description': 'Column: description (text)', 'is_primary_key': False, 'is_foreign_key': False, 'is_nullable': True, 'is_pii': False, 'cardinality':  ... (265 characters truncated) ... nd soft tissues', 'example_value': 'Endodontic treatment for back tooth', 'transformation_logic': None, 'downstream_usage': 'General purpose column'}", "{'description': 'Column: description (text)', 'is_primary_key': False, 'is_foreign_key': False, 'is_nullable': True, 'is_pii': False, 'cardinality':  ... (265 characters truncated) ... nd soft tissues', 'example_value': 'Endodontic treatment for back tooth', 'transformation_logic': None, 'downstream_usage': 'General purpose column'}", None, 'General purpose column', datetime.datetime(2025, 11, 21, 14, 38, 39, 104232), datetime.datetime(2025, 11, 21, 14, 38, 39, 104232))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi) (Background on this error at: https://sqlalche.me/e/20/7s2a)

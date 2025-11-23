@@ -214,14 +214,14 @@ async def delete_table(
     await session.delete(t)
     await session.commit()
     
-    # Log the deletion
-    await audit.log_action(
-        session=session,
-        action="delete",
-        model="table",
-        model_id=table_id,
-        user_id=user.id,
-        data={"table_name": t.technical_name}
-    )
+    # # Log the deletion
+    # await audit.log_action(
+    #     session=session,
+    #     action="delete",
+    #     model="table",
+    #     model_id=table_id,
+    #     user_id=user.id,
+    #     data={"table_name": t.technical_name}
+    # )
     
     return {"msg": "deleted"}
