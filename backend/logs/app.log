@@ -746,3 +746,19 @@
 2025-11-23 13:26:21 | INFO     | app.main:lifespan:35 - Shutting down...
 2025-11-23 13:26:25 | INFO     | app.main:lifespan:21 - Starting up Gold Catalog MVP..
 2025-11-23 13:26:25 | INFO     | app.main:lifespan:23 - Database initialization completed
+2025-11-23 13:34:53 | INFO     | app.routes.ingestion_routes:trigger_ingestion:105 - Ingestion job 6f411d87-6096-4c72-9539-9a1c43750283 started by user mounishsunkara23@gmail.com
+2025-11-23 13:34:53 | INFO     | app.routes.ingestion_routes:_run_ingestion_background:271 - Starting background ingestion job 6f411d87-6096-4c72-9539-9a1c43750283
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:ingest_database:531 - Starting metadata ingestion for schema: public, pattern: %
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:_upsert_database:630 - Created database: dental_appointment_db
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:ingest_database:549 - Found 9 tables matching pattern
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.appointment_exceptions (10 columns)
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.appointments (20 columns)
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.availability_exceptions (8 columns)
+2025-11-23 13:34:54 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.base_availability_rules (11 columns)
+2025-11-23 13:34:55 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.provider_services (4 columns)
+2025-11-23 13:34:55 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.recurring_patterns (12 columns)
+2025-11-23 13:34:55 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.service_providers (13 columns)
+2025-11-23 13:34:55 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.services (13 columns)
+2025-11-23 13:34:55 | INFO     | app.services.metadata_ingestion:_process_table:681 - Processed table: public.users (18 columns)
+2025-11-23 13:34:55 | INFO     | app.services.metadata_ingestion:ingest_database:572 - Ingestion complete: {'databases_processed': 1, 'tables_processed': 9, 'columns_processed': 0, 'errors': [], 'duration_seconds': 1.366424}
+2025-11-23 13:34:55 | INFO     | app.routes.ingestion_routes:_run_ingestion_background:286 - Ingestion job 6f411d87-6096-4c72-9539-9a1c43750283 completed successfully
